@@ -469,6 +469,42 @@ tiktoken (Python, BPE)
 heuristic (len(text) // 4)
 ```
 
+MPORTANT --- VECTORDB not included in V101A. DB must be rebuilt:
+
+markdown
+## Rebuilding the RAG Index
+ 
+The RAG index databases (`*.db`) are excluded from this repository due to size.
+Rebuild them locally after cloning:
+ 
+```powershell
+cd vw_rag
+python -m vw_rag index --root ../liminal_lore_vw_deck
+This indexes all source files into SQLite FTS5 tables for keyword search. Indexing ~866 files / ~46,700 chunks takes approximately 2 minutes.
+
+For multi-corpus indexing (separate indexes per project area):
+
+
+
+
+powershell
+python -m vw_rag index --multi-corpus
+Verify index status:
+
+
+
+
+powershell
+python -m vw_rag status
+Optional: Vector Similarity Search
+For semantic search (in addition to keyword search), install sentence-transformers:
+
+
+
+
+powershell
+pip install sentence-transformers
+Then rebuild the index — vector embeddings will be generated automatically. Without this package, the RAG engine falls back to keyword-only search (BM25).
 ## License
 
 Apache 2.0 — Lux Aura - Liminal Lore - VoidWalkers Project
