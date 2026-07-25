@@ -1,4 +1,4 @@
-# liminallore
+# liminallore Current Version 1.01B
 Lux Aura Presents "Liminal Lore" Agentic Toolchain Harness
 
 # Liminal Lore
