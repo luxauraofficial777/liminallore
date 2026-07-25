@@ -345,8 +345,8 @@ Apache 2.0 — LuxAura.
 
 **Liminal Lore v100, v100B, v101A* — Build 1
 Integrated Tech:
-TurboQuant https://github.com/0xsero/turboquant (V100,100B,V101A)
-Colibri https://github.com/JustVugg/colibri (V100,100B,V101A)
+TurboQuant https://github.com/0xsero/turboquant (V100A,100B,V101A)
+Colibri https://github.com/JustVugg/colibri (V100A,100B,V101A)
 gigatoken https://github.com/marcelroed/gigatoken (V101A)
 
 ---
