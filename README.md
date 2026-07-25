@@ -335,9 +335,143 @@ python -m config.setup_wizard --ship            # Shipping check
 
 ---
 
+# Liminal Lore V101A — Gigatoken Enhanced
+
+> **Liminal Lore** is a self-hosted, agentic game development suite with multi-agent
+> orchestration, local LLM inference, and pipeline automation.
+
+## What's New in V101A
+
+### Gigatoken Integration
+- **Shared token counter** (`shared/token_counter.py`) with gigatoken → tiktoken → heuristic fallback chain
+- **Exact token counting** across all components: RAG chunker, LLM provider, Colibri bridge, TurboQuant, ZHARK, FUBBU
+- **Pre-flight token checks** in FUBBU Worker, Router, and Verifier with automatic prompt truncation
+- **KV cache prediction** in TurboQuant based on token counts
+- **Throughput-aware expert swapping** in Colibri Bridge
+
+### New GUI Tabs
+- **ZHARK Tab**: Autonomous research orchestrator panel with:
+  - Research question display
+  - Hypothesis graph with status tracking (proposed, testing, confirmed, refuted)
+  - Cycle progress visualization
+  - Evidence and contradiction feed
+  - Strategic options panel
+  - Causal map
+  - Event log
+  - Start/stop cycle controls
+
+- **Global Telemetry Tab**: System health dashboard with:
+  - Token throughput (aggregate + per-expert tokens/sec)
+  - Tokenizer engine display (gigatoken backend)
+  - RAM usage with warning/critical thresholds
+  - Pagefile usage bars
+  - KV cache prediction from TurboQuant
+  - Colibri expert metrics (hot experts, cache hits/misses, swap events)
+  - Provider status (active provider, model, context window, prompt tokens)
+  - FUBBU worker stats (active, completed, failed)
+  - Nexus agent counts (registered agents, active tasks, file locks)
+
+### GUI Modernization
+- Version updated to v1.01A
+- Context gauge now visible in status bar (powered by gigatoken)
+- Tokenizer badge added to status bar
+- Suite version updated to v1.01A
+- All "Liminal Link" references replaced with "Liminal Lore" (trademark compliance)
+
+## Directory Structure
+
+```
+Liminal_Lore_V101A/
+├── README.md                          # This file
+├── docs/
+│   └── GIGATOKEN_INTEGRATION_SPEC.md  # Full gigatoken integration specification
+├── shared/
+│   └── token_counter.py               # Shared token counter (gigatoken → tiktoken → heuristic)
+├── liminal_lore_vw_deck/              # Main Liminal Lore application
+│   ├── VoidWalkers_Chat_GUI.html      # Web portal GUI (v1.01A with ZHARK + Telemetry tabs)
+│   ├── VoidWalkers_Suite.html         # Electron suite HTML
+│   ├── hermes-bridge.js               # Hermes API bridge server
+│   ├── colibri_bridge.py              # Colibri expert streaming bridge
+│   ├── turboquant-liminal.py          # TurboQuant KV cache manager
+│   ├── vw_nexus_service.py            # VW Nexus HTTP service
+│   ├── vw_deck.cpp                    # Native Win32 deck host
+│   ├── vw_deck.config.json            # Deck configuration
+│   ├── liminal_settings.json          # FS service settings
+│   ├── SETUP_GUIDE.md                 # Setup & extension guide
+│   ├── config/                        # Configuration package
+│   │   ├── config_loader.py           # Layered config loader
+│   │   ├── provider_abstraction.py    # LLM provider abstraction
+│   │   ├── setup_wizard.py            # Interactive setup wizard
+│   │   └── __init__.py
+│   ├── electron/                      # Electron desktop wrapper
+│   ├── colibri/                       # Colibri C/Rust core
+│   ├── scripts/                       # Utility scripts
+│   └── data/                          # Runtime data
+├── vw_nexus/                          # VW Nexus agent orchestration
+├── vw_rag/                            # RAG engine (FTS5 + vector search)
+├── zhark/                             # ZHARK autonomous research orchestrator
+├── fubbu/                             # FUBBU router-worker-verifier system
+└── docs/                              # Documentation
+```
+
+## Key Ports
+
+| Service         | Port  | Protocol |
+|-----------------|-------|----------|
+| Hermes Bridge   | 8643  | HTTP     |
+| TurboQuant      | 8646  | HTTP     |
+| Colibri Bridge  | 8648  | HTTP     |
+| VW Nexus        | 8651  | HTTP     |
+| VW Nexus WS     | 8652  | WebSocket|
+
+## Quick Start
+
+1. **Install dependencies**:
+   ```powershell
+   pip install gigatoken tiktoken
+   ```
+
+2. **Run the setup wizard**:
+   ```powershell
+   cd liminal_lore_vw_deck
+   python -m config.setup_wizard
+   ```
+
+3. **Start the Hermes bridge**:
+   ```powershell
+   cd liminal_lore_vw_deck
+   node hermes-bridge.js
+   ```
+
+4. **Open the GUI**:
+   Navigate to `http://127.0.0.1:8643` in your browser
+
+## Gigatoken Integration Points
+
+| Component         | Integration                                      |
+|-------------------|--------------------------------------------------|
+| RAG Chunker       | Token-based chunking replaces char-based         |
+| LLM Provider      | `count_tokens`, `fits_in_context`, `budget_for_context` |
+| Colibri Bridge    | Throughput tracking, throughput-aware swaps      |
+| TurboQuant        | KV cache prediction from token counts            |
+| ZHARK             | Prompt budgeting with `_budget_prompt`           |
+| FUBBU Worker      | Pre-flight token check + prompt truncation       |
+| FUBBU Router      | Pre-flight token check + prompt truncation       |
+| FUBBU Verifier    | Pre-flight token check + prompt truncation       |
+
+## Token Counter Fallback Chain
+
+```
+gigatoken (Rust, fastest)
+    ↓ (if unavailable)
+tiktoken (Python, BPE)
+    ↓ (if unavailable)
+heuristic (len(text) // 4)
+```
+
 ## License
 
-Apache 2.0 — LuxAura.
+Apache 2.0 — Lux Aura - Liminal Lore - VoidWalkers Project
 
 ---
 
