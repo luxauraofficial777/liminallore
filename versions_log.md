@@ -1,4 +1,199 @@
 # Liminal Lore — Versions Log
+## V101A → V101B (Liminal Lore)
+### Date: July 25, 2026
+
+---
+
+## Summary
+
+V101B fixes three critical issues that prevented the Liminal Lore suite from functioning:
+1. **FS "Path outside allowed directories"** — Hermes bridge failed to resolve relative `project_root` to an absolute path
+2. **ZHARK "is Nexus running?"** — Nexus API lacked `/zhark/status`, `/zhark/start`, `/zhark/stop` endpoints
+3. **Nexus crash on startup** — `provider_nexus.py` had wrong path calculation for `provider_registry` import
+
+---
+
+## Files Modified
+
+### 1. `hermes-bridge.js` (lines 17-24, 51-57)
+
+**`resolveConfig()` — project_root absolute path resolution**
+```js
+// V101A: project_root stayed as "../../.." — fileAccessGate received literal "${project_root}" strings
+// V101B: resolves to absolute path via path.resolve(__dirname, projectRoot)
+let projectRoot = rawConfig.project_root || path.dirname(path.dirname(__dirname));
+projectRoot = path.resolve(__dirname, projectRoot);
+```
+
+**`loadActiveConfig()` — workspace config fallback**
+```js
+// V101A: blindly used workspace config path even if file didn't exist
+// V101B: checks fs.existsSync, falls back to __dirname/vw_deck.config.json
+let configPath = path.join(__dirname, 'vw_deck.config.json');
+if (ws) {
+  const wsConfigPath = path.join(ws.project_root, ws.config_file);
+  if (fs.existsSync(wsConfigPath)) configPath = wsConfigPath;
+}
+```
+
+**Result:** `allowed_prefixes` now resolve to `C:\LuxAura\VoidWalkers_Project\Modern_X64` instead of `${PROJECT_ROOT}`. File browsing works.
+
+---
+
+### 2. `vw_nexus/api.py` (lines 550-581, 1428-1467, 1942-1944)
+
+**New GET endpoints:**
+- `GET /zhark/status` — Returns ZHARK cycle state (running, phase, iteration, hypotheses, evidence, strategies, causal_map, events)
+- `GET /fubbu/status` — Stub endpoint for FUBBU worker telemetry
+- `GET /tokenizer/status` — Stub endpoint for tokenizer/gigatoken info
+
+**New POST endpoints:**
+- `POST /zhark/start` — Starts a ZHARK research cycle with a question, returns initial cycle state with 5 phases (observe → hypothesize → test → analyze → synthesize)
+- `POST /zhark/stop` — Stops the active ZHARK cycle
+
+**Nexus `/status` response updated:**
+```python
+# V101B added:
+"tokenizer": {"engine": "gigatoken", "backend": "gigatoken", "loaded": False, "vocab_size": 0},
+```
+
+**Result:** GUI ZHARK panel can now poll `/zhark/status` and start/stop cycles without "is Nexus running?" errors.
+
+---
+
+### 3. `vw_nexus/provider_nexus.py` (lines 19, 37)
+
+**`_AGENT_DIR` path calculation fix:**
+```python
+# V101A: parent.parent.parent.parent = Modern_X64 (wrong — no AGENT/distilled_agents here)
+# V101B: parent.parent.parent.parent.parent = VoidWalkers_Project (correct)
+_AGENT_DIR = Path(__file__).parent.parent.parent.parent.parent / "AGENT" / "distilled_agents"
+```
+
+**Config path fix:**
+```python
+# V101A: "tools" / "liminal_lore_vw_deck" / "vw_deck.config.json"
+# V101B: "tools" / "Liminal_Lore_V101B" / "liminal_lore_vw_deck" / "vw_deck.config.json"
+config_path = str(project_root / "Modern_X64" / "tools" / "Liminal_Lore_V101B" / "liminal_lore_vw_deck" / "vw_deck.config.json")
+```
+
+**Result:** Nexus starts without `ModuleNotFoundError: No module named 'provider_registry'`.
+
+---
+
+### 4. `workspaces.json` (line 3)
+
+```json
+// V101A: "active_workspace": "VoidWalkers HD"  (display name — no matching workspace ID)
+// V101B: "active_workspace": "vw_hd"            (actual workspace ID)
+"active_workspace": "vw_hd",
+```
+
+**Result:** `loadActiveConfig()` correctly finds the workspace by ID, falls back to local config if workspace config path doesn't exist.
+
+---
+
+### 5. `vw_deck.config.json` (lines 7, 264-276)
+
+**Version string:**
+```json
+// V101A: "version": "v3.0"
+// V101B: "version": "v1.01B"
+```
+
+**project_root:**
+```json
+// V101A: "project_root": "${PROJECT_ROOT}"  (unresolved placeholder)
+// V101B: "project_root": "../../.."          (relative, resolved by hermes-bridge.js)
+```
+
+**allowed_prefixes:** Use `${project_root}` (lowercase) which `resolveConfig()` replaces with the absolute path.
+
+---
+
+### 6. `vw_deck.cpp` (lines 2, 390, 516, 521)
+
+**Version strings updated:**
+- Header comment: `v1.01A` → `v1.01B`
+- Window title: `v1.01A` → `v1.01B`
+- Log start banner: `v1.01A` → `v1.01B`
+- Init message: `v1.01A` → `v1.01B`
+
+**Service definitions (line 239):** VW Nexus already present with `autoStart=true` — no change needed.
+
+---
+
+### 7. `VoidWalkers_Chat_GUI.html` (lines 1758, 6864)
+
+**Version strings updated:**
+- Subtitle: `Liminal Lore // v1.01A` → `v1.01B`
+- Suite init log: `v1.01A` → `v1.01B`
+
+---
+
+### 8. `build-deck.bat` (full rewrite)
+
+**V101B improvements:**
+- Kills running `vw_deck.exe` before compiling (avoids file lock)
+- Compiles to `vw_deck_new.exe` then swaps to `vw_deck.exe`
+- Fallback rename to `.bak` if delete fails
+- Updated build title to `v1.01B`
+
+---
+
+### 9. `electron/` copies updated
+
+- `electron/vw_deck.config.json` — same fixes as root copy
+- `electron/liminal_settings.json` — absolute paths for `project_root`, `allowed_roots`, `study_dir`
+
+---
+
+## New Files
+
+| File | Purpose |
+|------|---------|
+| `start-all-services.bat` | Standalone script to kill old processes and start FS, Bridge, Nexus, TurboQuant, Ollama in order |
+
+---
+
+## Verification Results (2026-07-25 13:48)
+
+```
+BRIDGE (8643): ONLINE
+  project_root: ../../..
+  file_access.mode: allowlist
+  allowed_prefixes: ['C:\LuxAura\VoidWalkers_Project\Modern_X64', ...]
+
+NEXUS (8651): ONLINE, /zhark/status OK
+  running: False, phase: IDLE
+
+FS SERVICE (8644): ONLINE
+  allowed_roots: ['C:/LuxAura/VoidWalkers_Project/Modern_X64']
+
+LIST-DIR via bridge: OK
+```
+
+All three original errors resolved:
+- ✅ No more "Path outside allowed directories"
+- ✅ No more "Failed to start ZHARK — is Nexus running?"
+- ✅ Nexus starts without import crash
+
+---
+
+## Note: QA Testing Harness (Experimental)
+
+The `vw_qa_harness.py` script in the deck directory is an **experimental** testing
+tool included for development convenience. It has **not been formally tested**
+in the release build and should not be considered a production QA gate.
+
+- It connects to all running services and exercises endpoints, but edge cases,
+  error recovery, and service startup paths are not fully validated.
+- The `--start` flag kills and restarts processes aggressively — use with caution.
+- The ZHARK live cycle test makes real LLM calls to Ollama and can take several
+  minutes to complete.
+- Treat it as a developer debugging aid, not a certified test suite.
+
+
 
 | Version | Date | Type | Summary |
 |---------|------|------|---------|
