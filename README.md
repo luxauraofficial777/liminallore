@@ -1,4 +1,4 @@
-# liminalore
+# liminallore
 Lux Aura Presents "Liminal Lore" Agentic Toolchain Harness
 
 # Liminal Lore
