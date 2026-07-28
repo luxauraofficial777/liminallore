@@ -516,7 +516,7 @@ Apache 2.0 — Lux Aura - Liminal Lore - VoidWalkers Project
 **Liminal Lore v100, v100B, v101A* — Build 1
 Integrated Tech:
 TurboQuant https://github.com/0xsero/turboquant (V100A,100B,V101A)
-Colibri https://github.com/JustVugg/colibri (V100A,100B,V101A)
+Colibri https://github.com/JustVugg/colibri (V100A,100B,V101A, V101B)
 gigatoken https://github.com/marcelroed/gigatoken (V101A,V101B)
 
 ---
