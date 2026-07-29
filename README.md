@@ -932,6 +932,7 @@ Integrated Tech:
 TurboQuant https://github.com/0xsero/turboquant (V100A,100B,V101A,V101B)
 Colibri https://github.com/JustVugg/colibri (V100A,100B,V101A,V101B)
 gigatoken https://github.com/marcelroed/gigatoken (V101A,V101B)
+Caveman https://github.com/juliusbrussee/caveman (V101C)
 
 ---
 
