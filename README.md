@@ -927,7 +927,7 @@ Apache 2.0 — Lux Aura - Liminal Lore - VoidWalkers Project
 
 ## Version
 
-**Liminal Lore v100, v100B, v101A* — Build 1
+**Liminal Lore v100, v100B, v101A, v101B, v101C* — Build 1
 Integrated Tech:
 TurboQuant https://github.com/0xsero/turboquant (V100A,100B,V101A,V101B)
 Colibri https://github.com/JustVugg/colibri (V100A,100B,V101A,V101B)
