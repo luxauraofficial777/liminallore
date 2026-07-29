@@ -1,0 +1,180 @@
+===============================================================================
+ VHB SUPER BIOS — VERSION DIFF LOG
+ Product: Frankenstein-PSX Virtual Hypervisor BIOS
+ Generated: Jul 28, 2026 9:46 PM UTC-04
+===============================================================================
+
+-------------------------------------------------------------------------------
+ v0.1A → v0.1B  (Jul 28, 2026)
+-------------------------------------------------------------------------------
+
+PRODUCT: Frankenstein-PSX VHB Super BIOS
+FILES:   bioshackproject/frankenstein_bios.s
+         bioshackproject/build_frankenstein_bios.py
+         bioshackproject/bios_tool.cpp
+         bioshackproject/vhb_core.h
+         bioshackproject/vhb_core.cpp
+
+ADDED:
+  P2 — Configurable RAM Size
+    - RAM_SIZE register default changed 2MB → 8MB
+    - --ram-size 2|8|16 build flag with post-assembly binary patching
+    - patch_ram_size() detects lui+ori or addiu pattern, patches immediate
+    - RAM configs: 2MB=0x00000B88, 8MB=0x00000F88, 16MB=0x00001B88
+
+  P2 — Descriptor Pre-init (Preinit_Descriptors routine)
+    - Writes safe defaults before payload launch:
+      *0x800F2228 = 0x80100000  (published descriptor base)
+      *0x800D9A40 = 0x80100000  (descriptor table base)
+      *0x800F2238 = 0x00000000  (descriptor index)
+    - Called on both standard and SFX-100 boot paths
+
+  P3 — VHB Extended Memory Map
+    - TargetProfile struct: +ram_ceiling, +desc_publish_addr, +desc_safe_base
+    - TargetProfiles::get() takes configurable ram_mb parameter
+    - SuperBIOSHypervisor constructor accepts ram_mb
+    - init_memory_map() maps full configured RAM range (not fixed 2MB)
+    - MMU mappings adapt to configured RAM size
+    - Uncached mirror (0xA0000000) sized to configured RAM
+
+  P3 — VHB Descriptor Intercept Vector
+    - Registered at 0x8007AD74 (descriptor publish instruction)
+    - Lambda captures ram_ceiling + desc_safe_base from profile
+    - Clamps $a2 (reg 6) if descriptor base >= ceiling
+    - Works in concert with P1 EXE trampoline
+
+  P4 — BIOS Crash Handler (Exception Vector at 0xBFC00180)
+    - Saves 15 GPRs ($at–$t7) to debug area at 0x801FFF00
+    - Saves 4 COP0 regs: EPC, Cause, BadVAddr, Status
+    - Writes crash magic 0xDEADCAFE at 0x801FFF4C
+    - Halts in infinite loop for debugger/watchdog pickup
+
+  P4 — VHB Exception Vector Registration
+    - Vector at 0xBFC00180 with crash dump logging
+    - Prints register state when triggered
+
+CHANGED:
+  - frankenstein_bios.s: 106 → 161 instructions (424 → 644 bytes)
+  - vhb_core.h: TargetProfile struct +3 fields, TargetProfiles::get() +ram_mb param
+  - vhb_core.cpp: constructor +ram_mb param, memory map adaptive, +2 vectors
+  - build_frankenstein_bios.py: +--ram-size flag, +patch_ram_size() function
+
+UNCHANGED:
+  - bios_tool.cpp (no changes — still pads/signs/verifies)
+  - Clean-room compliance: 6/6 checks PASS
+  - Open-source signatures: FRANK-PSX / OPEN-BIOS
+  - BIOS size: 512KB (524,288 bytes)
+
+STATS:
+  v0.1A:  106 instructions, 424 bytes, SHA-256: 85ae7ced...
+  v0.1B:  161 instructions, 644 bytes, SHA-256: caa09f91...
+  Delta:  +55 instructions, +220 bytes
+
+VERIFICATION:
+  6/6 clean-room checks PASS (all 3 RAM configs: 2/8/16MB)
+  All C++ compiles cleanly: g++ -std=c++17 -O2
+
+-------------------------------------------------------------------------------
+ v0.1B → v100A  (Jul 29, 2026)
+-------------------------------------------------------------------------------
+
+PRODUCT: Frankenstein-PSX VHB Super BIOS
+FILES:   bioshackproject/frankenstein_bios.s
+         cybergrime/mips/assembler.py
+         cybergrime/mips/opcode.py
+
+ADDED:
+  S1 — PSX Syscall Vector Dispatch Infrastructure
+    - Three 4-instruction vector stubs (A0/B0/C0) installed at RAM 0xA0/0xB0/0xC0
+    - Each stub indexes into a RAM-resident function table using $t1 as function number
+    - A0 vector → table at 0x80010000 (0xC0 entries, 0x300 bytes)
+    - B0 vector → table at 0x80010300 (0x60 entries, 0x180 bytes)
+    - C0 vector → table at 0x80010480 (0x20 entries, 0x80 bytes)
+    - Install_Syscall_Vectors copies stubs to RAM during boot
+    - Copy_Syscall_Tables copies ROM tables to RAM via byte-level Memcopy
+
+  S2 — Interrupt Controller Initialization
+    - ISTAT cleared (all flags zeroed)
+    - IMASK set to 0xC5 (VBlank + GPU + CDROM + DMA enabled)
+
+  S3 — Kernel Heap Allocator
+    - Bump allocator at 0x80018000, 32KB (0x8000) heap
+    - Globals area at 0x80010A00 (heap_ptr, heap_size, event_count, thread_count)
+    - malloc: returns current heap_ptr, advances by size, 4-byte aligned
+    - free: no-op (bump allocator)
+    - calloc: malloc + return (RAM is pre-zeroed)
+    - realloc: malloc new size
+    - InitHeap: configurable heap base/size
+
+  S4 — Event Control Block (EvCB) System
+    - 16 event slots at 0x80010B00 (16 bytes each)
+    - openEvent returns handle 0xF1000000 | slot
+    - deliverEvent, closeEvent, waitEvent, testEvent, enableEvent, disableEvent stubs
+
+  S5 — Thread Control Block (TCB) System
+    - 4 thread slots at 0x80010C00 (128 bytes each)
+    - openThread returns handle 0xFF000000 | slot
+    - closeThread, changeThread stubs
+    - getFreeTCBslot returns first free slot
+
+  S6 — A0 Syscall Stubs (20 implemented)
+    - File I/O: open(0x00), read(0x02), write(0x03), close(0x04)
+    - Math: abs(0x0E), labs(0x0F)
+    - String: atoi(0x10), strcmp(0x17), strcpy(0x19), strlen(0x1B)
+    - Memory: memcpy(0x2A), memset(0x2B)
+    - Heap: malloc(0x33), free(0x34), calloc(0x37), realloc(0x38), InitHeap(0x39)
+    - I/O: printf(0x3F)
+    - System: FlushCache(0x44)
+    - GPU: GPU_dw(0x46), GPU_mem2vram(0x47), GPU_send(0x48)
+
+  S7 — B0 Syscall Stubs (15 implemented)
+    - Kernel heap: kmalloc(0x00), kfree(0x01)
+    - Events: deliverEvent(0x07), openEvent(0x08), closeEvent(0x09),
+      waitEvent(0x0A), testEvent(0x0B), enableEvent(0x0C), disableEvent(0x0D)
+    - Threads: openThread(0x0E), closeThread(0x0F), changeThread(0x10)
+    - Exception: returnFromException(0x14)
+    - File I/O: open(0x32), lseek(0x33), read(0x34), write(0x35), close(0x36)
+    - System: exit(0x39), puts(0x3F)
+
+  S8 — C0 Syscall Stubs (6 implemented)
+    - Threads: getFreeTCB(0x05)
+    - Exception: exceptionHandler(0x06), installExceptionHandler(0x07)
+    - Heap: kinitheap(0x08)
+    - File I/O: setupFileIO(0x10), reopenStdio(0x11)
+
+  S9 — Unimplemented Syscall Handler
+    - Sys_Unimplemented writes function number to 0x801FFFF0 diagnostic marker
+    - Returns 0 for graceful degradation
+
+  S10 — Full PSX Boot Sequence
+    - Boot now: HW init → RAM clear → GPU init → CD-ROM init → ISO 9660 parse
+      → SYSTEM.CNF parse → EXE load → Flush cache → Install syscall vectors
+      → Copy syscall tables → Init interrupt controller → Init heap
+      → Init events (16) → Init threads (4) → Set BEV=0 → Flush cache
+      → Jump to EXE entry point
+
+CHANGED:
+  - frankenstein_bios.s: 161 → 9,479 instructions (644 → 37,916 bytes)
+  - assembler.py: .word now accepts labels (W fixup), la now accepts labels (LUI/ORI fixups)
+  - Boot sequence: +10 init steps before EXE jump
+  - Exception handler: now saves registers to 0x801FFF00 (was 0x801FFF00 in v0.1B)
+
+UNCHANGED:
+  - bios_tool.cpp (no changes — still pads/signs/verifies)
+  - Clean-room compliance: 6/6 checks PASS
+  - Open-source signatures: OpenBIOS at 0x78, VHB-SUPER-BIOS-v0.2 at 0x7FE0
+  - BIOS size: 512KB (524,288 bytes)
+
+STATS:
+  v0.1B:    161 instructions, 644 bytes, SHA-256: caa09f91...
+  v100A:  9,479 instructions, 37,916 bytes, SHA-256: a62e7e51...
+  Delta: +9,318 instructions, +37,272 bytes
+
+VERIFICATION:
+  6/6 clean-room checks PASS
+  OpenBIOS signature at 0x78: PASS
+  VHB-SUPER-BIOS-v0.2 at 0x7FE0: PASS
+  No proprietary strings (SCPH/Sony): PASS
+  Python fallback assembler (zero external deps): PASS
+
+===============================================================================
