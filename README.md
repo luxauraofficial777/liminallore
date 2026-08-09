@@ -1,15 +1,181 @@
 # liminallore Current Version 1.1B (Fully working build)
 <img width="1024" height="576" alt="image" src="https://github.com/user-attachments/assets/a5e277c5-71c9-4bb7-9d10-1467a57f1fb7" />
 
-Lux Aura Presents "Liminal Lore" Agentic Toolchain Harness
-
+Lux Aura Presents "Liminal Lore" Agentic Toolchain Harness Current Build 1.1B-GammaLanguageV1.1A-Robust
 # Liminal Lore
-
 **Autonomous agentic research and development suite — self-hosted, local-first, zero cloud dependency.**
-
 Liminal Lore is a complete agentic toolchain for long-horizon autonomous research, multi-agent orchestration, and AI-assisted development. It runs entirely on local hardware using open-weight LLMs (via Ollama or any OpenAI-compatible endpoint). No API keys required for core functionality.
 
-Liminal Lore V1.1A Gamma Language (A2A-DSL): Replaced standard JSON/YAML communication with a native DSL, reducing token consumption by over 65%.  Zero-Copy AST Broadcasting: Replaced legacy WebSockets with a memory-mapped ring buffer (SharedMemoryBus) for zero-serialization IPC between local nodes and Python services.  GPU Vector Acceleration: Added Vulkan-based compute shaders to GPUComputeEngine to offload vector and Cosine Similarity calculations to the GPU.  Cross-Module AST Memoization: Implemented AST_Memoizer to eliminate redundant lexing cycles across modules.  Toolchain Integration: Updated Colibri MoE to support Gamma arrays and probabilistic expert pinning, while integrating Caveman compression for byte-exact state shifts.  Gamma AST Terminal: Added a dedicated GUI telemetry tab to monitor live AST packets flowing through shared memory in real time.  Performance Validations: Verified 0 dynamic heap allocations on the C++ hotpath and reached parser throughput exceeding 40,000 evaluations per second.  Liminal Lore Deck V1.1BDeck Rebranding: Renamed all "VOID WALKERS" references to "Liminal Lore Deck" across C++ window titles, menu bars, HTML headers, configuration files, and build scripts.  Caveman Middleware Diagnostics & Testing:Added comprehensive diagnostic logging throughout the compression and message injection pipeline.  Introduced the GET /caveman/test endpoint to inspect runtime settings, message modifications, and skill payloads.  Added a Caveman toggle and level selector to the DECK view toolbar, alongside an amber header status indicator (CAVEMAN: FULL / LITE / OFF).  Fixed a caching bug where empty skill files were permanently cached and blocked subsequent reloads.  System & Service Fixes:Fixed the FS service "directory outside allowed path" error by allowing path resolution to fall back to workspace project roots.  Corrected the VW Nexus menu shortcut in vw_deck.cpp to call service index 7 instead of Colibri Bridge (index 5).  Enhanced StartSvc() error reporting to output native Windows error codes via GetLastError().  Binary Build: Recompiled and verified vw_deck.exe using MinGW-W64. Added GammaLanguage 1.1A support.
+Liminal Lore V1.1A Gamma Language (A2A-DSL): Replaced standard JSON/YAML communication with a native DSL, reducing token consumption by over 65%.  Zero-Copy AST Broadcasting: Replaced legacy WebSockets with a memory-mapped ring buffer (SharedMemoryBus) for zero-serialization IPC between local nodes and Python services.  GPU Vector Acceleration: Added Vulkan-based compute shaders to GPUComputeEngine to offload vector and Cosine Similarity calculations to the GPU.  Cross-Module AST Memoization: Implemented AST_Memoizer to eliminate redundant lexing cycles across modules.  Toolchain Integration: Updated Colibri MoE to support Gamma arrays and probabilistic expert pinning, while integrating Caveman compression for byte-exact state shifts.  Gamma AST Terminal: Added a dedicated GUI telemetry tab to monitor live AST packets flowing through shared memory in real time.  Performance Validations: Verified 0 dynamic heap allocations on the C++ hotpath and reached parser throughput exceeding 40,000 evaluations per second.  Liminal Lore Deck V1.1BDeck Rebranding: Renamed all "VOID WALKERS" references to "Liminal Lore Deck" across C++ window titles, menu bars, HTML headers, configuration files, and build scripts.  Caveman Middleware Diagnostics & Testing:Added comprehensive diagnostic logging throughout the compression and message injection pipeline.  Introduced the GET /caveman/test endpoint to inspect runtime settings, message modifications, and skill payloads.  Added a Caveman toggle and level selector to the DECK view toolbar, alongside an amber header status indicator (CAVEMAN: FULL / LITE / OFF).  Fixed a caching bug where empty skill files were permanently cached and blocked subsequent reloads.  System & Service Fixes:Fixed the FS service "directory outside allowed path" error by allowing path resolution to fall back to workspace project roots.  Corrected the VW Nexus menu shortcut in vw_deck.cpp to call service index 7 instead of Colibri Bridge (index 5).  Enhanced StartSvc() error reporting to output native Windows error codes via GetLastError().  Binary Build: Recompiled and verified vw_deck.exe using MinGW-W64. Added GammaLanguage 1.1A-Robust support.
+
+# Liminal Lore V1.1B + GammaLanguage Integration Blueprint
+
+**Date:** August 10, 2026  
+**Version:** V1.1B+Gamma  
+**GammaLanguage Spec:** v1.1A-Robust+ (Peak Performance)
+
+---
+
+## Executive Summary
+
+This document records the full architectural integration of GammaLanguage v1.1A-Robust+ into the Liminal Lore V1.1B codebase. Three subsystems were modified: the C++ host (vw_deck.cpp), the FUBBU worker sidecar, and the VW Nexus WebSocket bus. The integration replaces legacy JSON-RPC structures with A2A-DSL AST frames and adds support for all five Peak Performance additions.
+
+---
+
+## Changes by Subsystem
+
+### 1. C++ Host Integration (`liminal_lore_vw_deck/`)
+
+#### New File: `gamma/A2A_Gamma.h`
+- **Single-file inline header** merging A2AST.h + A2ALexer.h + A2AEvaluator.h
+- GPU compute stubbed (no Vulkan dependency for Deck build)
+- Contains all v1.1A-Robust+ types: `RegisterBank` (8 banks), `ASTNode`, `ASTArena<256>`, `BytecodeArena<512>`, `A2AB_Instruction`, `BytecodeCompiler`, `Lexer`, `Evaluator`
+- All Peak Performance opcodes implemented: QVEC_LOAD, VEC_DELTA, PREDICT_BLOCK, SPEC_COMMIT, SPEC_ROLLBACK, HW_INTERRUPT, EVICT_SLIDING
+- Direct Threaded Code bytecode VM via `Evaluator::ExecuteBytecode()`
+
+#### Modified: `vw_deck.cpp`
+- **Include:** `#include "gamma/A2A_Gamma.h"` at line 30
+- **Globals:** `g_gammaRegs` (RegisterBank), `g_gammaArena` (ASTArena<256>), `g_gammaBytecode` (BytecodeArena<512>), `g_gammaEvaluator` (Evaluator, 10K cycle limit)
+- **New function:** `ExecuteGammaPayload(const char* gammaScript)` — parses DSL → AST → execute → compile to bytecode → execute via DTC
+- **Command dispatcher:** Added `gamma`, `gamma <script>`, `gamma test`, `gamma status` commands
+- **Built-in test script:** Exercises all 5 peak features (!STATE, @INVARIANT, |TARGET, +SKILL, #QVEC, #VEC_DELTA, @PREDICT/SPEC_COMMIT, %HW_INT, ^EVICT_SLIDING, ~MCP_CALL)
+- **Register status display:** Shows ActiveTarget, ActiveExpert, RetryCount, FrameCount, PendingInt, SpecBuf state, AST/bytecode counts, LCK locks
+
+#### Modified: `build-deck.bat`
+- Updated title to "Build V1.1B+Gamma"
+- Added GammaLanguage feature list in build success message
+- No compiler flag changes needed (header is inline, no external .cpp files)
+
+#### Modified: `vw_deck.config.json`
+- Deck version: `v1.1B+Gamma`
+- Added `gamma_language` and `gamma_features` fields
+
+### 2. FUBBU Sidecar (`fubbu/fubbu_worker.py`)
+
+#### Import
+- Added `gamma_bridge.GammaBridge` import with path resolution to `GammaLanguage/python/`
+- Graceful fallback: `_GAMMA_AVAILABLE = False` if import fails
+
+#### Prompt Compression
+- `execute()` method now calls `_gamma.caveman_compress(full_prompt, level="full")` before sending to Ollama
+- Strips filler phrases, reduces token count by ~65%
+- Ollama API call still uses JSON (required by Ollama protocol)
+
+#### Output Wrapping
+- After successful inference, output is wrapped in a GammaLanguage script frame:
+  - `!STATE` with task hash
+  - `@INVARIANT: output != ""`
+  - `$EXEC { CAVEMAN_SHRINK(CTX[0], FULL); EMIT_SIGNAL("worker_done", latency); }`
+- Compiled via `GammaBridge.compile_gamma()` and returned as `gamma_frame` in result dict
+- `gamma_compressed` boolean flag indicates whether prompt was compressed
+
+### 3. VW Nexus WebSocket (`vw_nexus/websocket_server.py`)
+
+#### GammaLanguage Frame Codec
+- `_encode_gamma_frame()`: Outgoing messages wrapped in A2A-DSL script → compiled to AST frame → JSON-serialized with `_envelope` containing original message
+- `_decode_gamma_frame()`: Incoming messages tried as JSON first (backward compat), then as raw GammaLanguage DSL, with `_envelope` extraction for Gamma frames
+
+#### #HIVE Routing
+- `BusConnection.hive` field added — tracks which #HIVE partition each connection belongs to
+- `hive_select` message type — sets connection's hive partition
+- `hive_route` message type — routes payload to all agents in a target hive
+- `hive_selected` / `hive_routed` response types
+- `get_stats()` now reports active hives and `gamma_enabled` flag
+
+#### Gamma Script Execution
+- `gamma_script` message type — allows agents to submit raw A2A-DSL scripts for compilation
+- `gamma_result` response — returns compiled AST node count, sigil breakdown, peak feature summary
+
+#### Outgoing Message Encoding
+- `_send()` now calls `_encode_gamma_frame()` instead of `json.dumps()` directly
+- All message types (handshake, state_update, handoff, heartbeat, etc.) are Gamma-encoded
+
+---
+
+## Architecture Diagram
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                  Liminal Lore Deck v1.1B+Gamma           │
+│                                                          │
+│  ┌──────────────┐   ┌──────────────┐   ┌──────────────┐ │
+│  │  vw_deck.cpp │   │  fubbu_worker│   │  vw_nexus    │ │
+│  │  (C++ Host)  │   │  (Python)    │   │  (WebSocket) │ │
+│  │              │   │              │   │              │ │
+│  │ A2A_Gamma.h  │   │ gamma_bridge │   │ gamma_bridge │ │
+│  │  ├ Lexer     │   │  ├ compress  │   │  ├ encode    │ │
+│  │  ├ Evaluator │   │  ├ compile   │   │  ├ decode    │ │
+│  │  ├ BytecodeVM│   │  └ frame     │   │  └ #HIVE     │ │
+│  │  └ 8 banks   │   │              │   │              │ │
+│  └──────┬───────┘   └──────┬───────┘   └──────┬───────┘ │
+│         │                  │                   │         │
+│         └──────────────────┼───────────────────┘         │
+│                            │                             │
+│                   GammaLanguage v1.1A-Robust+             │
+│                   ├ 15 sigils, 8 register banks           │
+│                   ├ PEAK-1: A2A-B Bytecode (DTC)          │
+│                   ├ PEAK-2: #QVEC 8-bit quantized         │
+│                   ├ PEAK-3: @PREDICT speculative          │
+│                   ├ PEAK-4: %HW_INT frame-sync            │
+│                   └ PEAK-5: ^EVICT_SLIDING ring-buffer    │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Files Modified
+
+| File | Action | Lines Changed |
+|------|--------|--------------|
+| `liminal_lore_vw_deck/gamma/A2A_Gamma.h` | **NEW** | ~480 lines |
+| `liminal_lore_vw_deck/vw_deck.cpp` | Modified | +include, +globals, +ExecuteGammaPayload(), +commands |
+| `liminal_lore_vw_deck/build-deck.bat` | Modified | Title + success message |
+| `liminal_lore_vw_deck/vw_deck.config.json` | Modified | Version + gamma fields |
+| `fubbu/fubbu_worker.py` | Modified | +import, +Caveman compress, +Gamma frame output |
+| `vw_nexus/websocket_server.py` | Modified | +Gamma codec, +#HIVE routing, +gamma_script handler |
+
+---
+
+## Usage
+
+### Deck Terminal (vw_deck.cpp)
+```
+gamma              — Show GammaLanguage help
+gamma test         — Run built-in peak performance test
+gamma status       — Show register bank state
+gamma !STATE: 0x0A |TARGET: [D3DX11] ~MCP_CALL("test")
+```
+
+### FUBBU Worker
+- Prompt compression happens automatically when `gamma_bridge` is importable
+- Output dict includes `gamma_frame` (compiled A2A-DSL) and `gamma_compressed` (bool)
+
+### VW Nexus WebSocket
+- Send `{"type": "hive_select", "hive": "vw_x64"}` to join a hive partition
+- Send `{"type": "hive_route", "target_hive": "vw_x64", "payload": {...}}` to route to hive members
+- Send `{"type": "gamma_script", "script": "!STATE: 0x0A ..."}` to compile DSL on the bus
+- All outgoing messages are Gamma-encoded frames with `_envelope` backward compatibility
+
+---
+
+## Backward Compatibility
+
+- **FUBBU:** If `gamma_bridge` import fails, worker operates in legacy mode (no compression, no frame)
+- **VW Nexus:** `_decode_gamma_frame()` tries JSON first — non-Gamma clients work unchanged
+- **C++ Host:** `ExecuteCommand()` retains all original commands; `gamma` is additive
+- **Config:** `gamma_features` array is informational; Deck runs without GammaLanguage if header is absent
+
+---
+
+## Build Instructions
+
+```bat
+cd liminal_lore_vw_deck
+build-deck.bat
+```
+
+The `gamma/A2A_Gamma.h` header is fully inline — no additional `.cpp` files or linker flags needed. The existing `cl /O2 /EHsc` or `g++ -O2 -std=c++17` commands compile it directly.
+
 
 What's New in Liminal Lore V1.1A 🚀
 Welcome to Liminal Lore V1.1A, the most significant architectural evolution for the VoidWalkers Agentic toolchain to date. This release introduces the Gamma Language Integration, replacing bloated JSON payloads with a token-optimal, native machine language designed explicitly for silicon and AI agents.
