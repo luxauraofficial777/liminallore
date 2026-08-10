@@ -1,5 +1,6 @@
-# liminallore Current Version 1.1B (Fully working build)
-<img width="1024" height="576" alt="image" src="https://github.com/user-attachments/assets/a5e277c5-71c9-4bb7-9d10-1467a57f1fb7" />
+# liminallore Current Version 1.1C (Fully working build)
+<img width="1024" height="576" alt="image" src="https://github.com/user-attachments/assets/03a358cf-3bb5-4be6-ad91-765516237d46" />
+
 
 Lux Aura Presents "Liminal Lore" Agentic Toolchain Harness Current Build 1.1B-GammaLanguageV1.1A-Robust
 # Liminal Lore
