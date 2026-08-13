@@ -1,4 +1,4 @@
-# liminallore Current Version 1.1C (Fully working build)
+# liminallore Current Version 1.21A
 <img width="1024" height="733" alt="image" src="https://github.com/user-attachments/assets/2dd1e505-113c-41d3-b48e-a62589ea7a7e" />
 
 ╔══════════════════════════════════════════════════════════════════════════════╗
