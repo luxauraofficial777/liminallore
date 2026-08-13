@@ -1,23 +1,6 @@
 # liminallore Current Version 1.21A
 <img width="1024" height="733" alt="image" src="https://github.com/user-attachments/assets/2dd1e505-113c-41d3-b48e-a62589ea7a7e" />
 
-╔══════════════════════════════════════════════════════════════════════════════╗
- ║                                                                              ║
- ║     /========\      /═════════════════════\      /========\                  ║
- ║    //  ?ZHARK \\    ║  LIMINAL LORE v1.21A ║    // ¿FUBBU  \\                 ║
- ║   ||   (AST)   ||===╬═════════════════════╬===||   SYNC   ||                 ║
- ║    \\  ~MCP   //    ║   GAMMA  LANG v1.1C  ║    \\ $MEM   //                 ║
- ║     \========/      \═════════════════════/      \========/                  ║
- ║                            │           │                                     ║
- ║                    [ HAZ-01 CANONICAL TOOLCHAIN ]                            ║
- ║                    [ ZERO-COPY AST & MAG IPC BUS ]                           ║
- ║                                                                              ║
- ╚══════════════════════════════════════════════════════════════════════════════╝
- _     _____ __  __ ___ _  _    _  _     _     ___  ___ ___   _  _   ___  _   
- | |   |_   _|  \/  |_ _| \| |  /_\| |   | |   / \ | _ \ __| | |/ | |_  )/_\  
- | |__  | | | |\/| || || .` | / _ \ |__ | |__| (_) ||   / _|  | | | |  / // _ \ 
- |____| |_| |_|  |_|___|_|\_|_/_/ \_\____|____|\___/ |_|_|___| |_|_|_ /___/_/ \_\
- ==================== [ LIMINALLORE AGENTIC SUITE v1.21A ] ====================
 
 Lux Aura Presents "Liminal Lore" Agentic Toolchain Harness Current Build 1.1B-GammaLanguageV1.1A-Robust
 # Liminal Lore
