@@ -2,7 +2,15 @@
 <img width="1024" height="733" alt="image" src="https://github.com/user-attachments/assets/2dd1e505-113c-41d3-b48e-a62589ea7a7e" />
 
 
-Lux Aura Presents "Liminal Lore" Agentic Toolchain Harness Current Build 1.1B-GammaLanguageV1.1A-Robust
+Lux Aura Presents "Liminal Lore" Agentic Toolchain Harness Current Build 1.21A-GammaLanguageV1.11C
+Install dependency: 
+https://github.com/luxauraofficial777/gammalanguage
+https://github.com/JustVugg/colibri
+https://github.com/0xSero/turboquant/
+https://github.com/juliusbrussee/caveman
+https://github.com/marcelroed/gigatoken
+
+
 # Liminal Lore
 **Autonomous agentic research and development suite — self-hosted, local-first, zero cloud dependency.**
 Liminal Lore is a complete agentic toolchain for long-horizon autonomous research, multi-agent orchestration, and AI-assisted development. It runs entirely on local hardware using open-weight LLMs (via Ollama or any OpenAI-compatible endpoint). No API keys required for core functionality.
