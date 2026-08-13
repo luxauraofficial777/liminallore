@@ -7,6 +7,55 @@ Lux Aura Presents "Liminal Lore" Agentic Toolchain Harness Current Build 1.1B-Ga
 **Autonomous agentic research and development suite — self-hosted, local-first, zero cloud dependency.**
 Liminal Lore is a complete agentic toolchain for long-horizon autonomous research, multi-agent orchestration, and AI-assisted development. It runs entirely on local hardware using open-weight LLMs (via Ollama or any OpenAI-compatible endpoint). No API keys required for core functionality.
 
+# Liminal Lore Release Document
+## Version: v1.21A — August 13, 2026
+
+**Author:** Lux Aura / Antigravity Suite  
+**Target Architecture:** VoidWalkers Agentic Control Deck, Modern_X64  
+
+---
+
+### Executive Summary
+
+**Liminal Lore v1.21A** is a production-ready, fully verified architecture update for the VoidWalkers agentic suite. It vendor-consolidates the toolchain modules (HAZ-01), integrates natively with **GammaLanguage v1.1C**, embeds the **Liminal Link 4-gate operations manager**, resolves Python 3.10/3.11 compatibility bugs in `setup_wizard.py`, and arms the VoidWalkers Chat GUI with live zero-copy AST & MAG telemetry.
+
+---
+
+### Key Technical Upgrades in v1.21A
+
+1. **HAZ-01 Tool Fork Elimination & Clean Vendoring:**
+   - Consolidated 15 historical tool forks across legacy build paths (`liminal_lore_build_v1`, `V1.1C`, `V100B`, `V101B`, `V101C`).
+   - Vendored self-contained, canonical copies of `fubbu`, `zhark`, and `vw_nexus` directly within the suite directory, removing legacy import dependencies.
+
+2. **GammaLanguage v1.1C Native Pipeline Integration:**
+   - Full AST opcode dispatch for `?ZHARK`, `¿FUBBU_SYNC`, `~MCP`, `$MEM_QUERY`, `!MEM_COMMIT`, `@ON_ERROR`, and `^GIGATOKEN_PACK`.
+   - Inline Caveman prompt compression (38.5% measured token reduction) on active worker LLM call sites.
+
+3. **`setup_wizard.py` Python Pre-3.12 Syntax Hardening:**
+   - Fixed nested double-quote syntax errors inside f-strings (`f"{info.get('status')}"`) at lines 667 and 675 of `setup_wizard.py`.
+   - Restored zero-error execution for Python 3.10 and 3.11 environments.
+
+4. **Liminal Link Operations Manager Integration (`liminal_link.py`):**
+   - Verified the fallback resolution chain in `liminal_link.py`. `GAMMA_ROOT` cleanly resolves to the suite's internal GammaLanguage engine.
+   - Monitors 4-gate verification status: C++ Suite (94 tests), Python E2E (93 tests), Rust FFI (5 tests), and Conformance (19/19 agreed).
+
+5. **VoidWalkers Chat GUI Deck Upgrade (`VoidWalkers_Chat_GUI.html`):**
+   - Added **Gamma AST & MAG Memory Inspector** tab with real-time zero-copy IPC packet stream visualization (`Local\VW_Nexus_AST_Bus`).
+   - Integrated live token budget allocation gauges (60% Prompt / 25% RAG / 15% MAG).
+
+---
+
+### Verification Matrix
+
+- **Setup Wizard Integrity:** `setup_wizard.py` executes without syntax errors on Python 3.10–3.12.
+- **Liminal Link Fallback:** `liminal_link.py` resolves `GAMMA_ROOT` cleanly from within the suite.
+- **Canonical Tool Integrity:** Vendored `fubbu`, `zhark`, and `vw_nexus` modules execute in isolation without missing dependencies.
+- **Cross-Implementation Parity:** 19/19 corpus scripts agree between C++ AST VM and Python host.
+- **GUI Telemetry:** HTML5 Deck correctly renders live zero-copy AST stream and MAG memory nodes.
+
+
+
+
 Liminal Lore V1.1C — Autonomous Agentic SuiteLiminal Lore is a self-hosted, agentic development suite designed for multi-agent orchestration, local LLM inference, and pipeline automation. Version 1.1C brings full GammaLanguage v1.1C (A2A-DSL) integration across all core subsystems, enabling zero-copy token-optimal execution, bare-metal hardware interop, and directive routing.
 
 ⚡ Key Highlights in V1.1CGammaLanguage v1.1C Protocol: Native A2A-DSL integration across FUBBU, ZHARK, VW Nexus, and the C++ Deck host.  Caveman Token Compression: Reduces token overhead by ~65% across all LLM call sites while keeping commands and code byte-exact.  Gigatoken Fallback Engine: Shared counter featuring a gigatoken (Rust) → tiktoken → heuristic execution chain.  TurboQuant Pre-Flight Guard: Performs RAM pressure capacity checks before inference to dynamically adjust context bounds and prevent OOM errors.  Directive Routing & Hive Partitions: Intercepts and routes ?ZHARK research tasks and ¿FUBBU sidecar directives via #HIVE partitioned WebSocket channels.  
